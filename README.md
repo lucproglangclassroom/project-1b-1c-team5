@@ -1,30 +1,77 @@
-[![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=22673720)
-# Overview
+# topwords
 
-Very simple example including an App and a few tests 
-(illustrating different testing styles).
+`topwords` reads a stream of words from standard input and prints a continuously updated word cloud based on the most recent valid words in a sliding window.
 
-# Running the app
+## Running the app
 
-    sbt run
+Build and stage the app:
 
-# Running the tests
+sbt clean stage
 
-    sbt test
+Run it:
 
-# Determining test coverage
+./target/universal/stage/bin/topwords
 
-    sbt clean coverage test coverageReport
-	
-Now open this file in a web browser:
+Run with arguments:
 
-    target/scala-*/scoverage-report/index.html
+./target/universal/stage/bin/topwords -c 3 -l 2 -w 5
 
-Note that the Scala version number might vary depending on what's defined in the build configuration (`build.sbt`).    
+## Command-line options
 
-# Running a Scala console
+- `-c` word cloud size, default `10`
+- `-l` minimum word length, default `6`
+- `-w` sliding window size, default `1000`
 
-This allows you to explore the functionality of the classes in this
-project in a Scala REPL while letting sbt set the classpath for you.
+## Example
 
-    sbt console
+./target/universal/stage/bin/topwords -c 3 -l 2 -w 5
+
+Input:
+
+a b c
+aa bb cc
+aa bb aa bb
+
+Output:
+
+aa: 2 bb: 2 cc: 1
+aa: 2 bb: 2 cc: 1
+aa: 2 bb: 2 cc: 1
+
+## Testing
+
+Run the project tests:
+
+sbt "testOnly edu.luc.cs.cs371.topwords.impl.TopWordsProcessorTest edu.luc.cs.cs371.topwords.impl.TopWordsMainTest edu.luc.cs.cs371.topwords.impl.ConsoleObserverTest"
+
+## Coverage
+
+Coverage was measured with scoverage.
+
+Run coverage with:
+
+sbt clean coverage "testOnly edu.luc.cs.cs371.topwords.impl.TopWordsProcessorTest edu.luc.cs.cs371.topwords.impl.TopWordsMainTest edu.luc.cs.cs371.topwords.impl.ConsoleObserverTest" coverageReport
+
+Coverage achieved:
+- Statement coverage: `84.78%`
+- Branch coverage: `90.00%`
+
+## Scalability
+
+The program uses a bounded sliding window and frequency map, so it runs in constant space relative to the input stream length.
+
+A memory screenshot from a long-running test is included in:
+
+- `doc/scalability-memory.png`
+
+The command used was:
+
+yes helloworld | ./target/universal/stage/bin/topwords > /dev/null
+
+## Logging
+
+The application uses Scala Logging with Logback for diagnostic output.
+
+## Notes
+
+The original `echo` starter files were kept in the repository as reference material. The `topwords` implementation and tests are separate.
